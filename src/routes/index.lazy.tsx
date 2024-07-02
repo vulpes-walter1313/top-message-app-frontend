@@ -13,10 +13,13 @@ function Index() {
           <h1 className="">Welcome to ChattApp</h1>
           <p>A simple chat app made for the odin project exercises.</p>
         </div>
-        <div>
-          
-          <Button href="#" as="link" variant="solid">Sign In</Button>
-          <Button href="#" as="link" variant="outline">Join</Button>
+        <div className="flex gap-4">
+          <Button href="#" as="link" variant="solid">
+            Sign In
+          </Button>
+          <Button href="/register" as="link" variant="outline">
+            Join
+          </Button>
         </div>
       </div>
     </main>
