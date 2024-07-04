@@ -10,7 +10,9 @@ h5,
 h6,
 p,
 a,
-li {
+li,
+label,
+input {
   font-family: "Roboto", sans-serif;
 }
 
