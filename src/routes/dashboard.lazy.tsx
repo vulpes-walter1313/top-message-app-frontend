@@ -40,8 +40,8 @@ function DashboardPage() {
   return (
     <main className="w-full">
       <div className="flex flex-col justify-center gap-16">
-        <div className="mx-auto max-w-3xl mt-10 lg:mt-20">
-          <h1 className="text-center mb-8">Start Chatting</h1>
+        <div className="mx-auto mt-10 max-w-3xl lg:mt-20">
+          <h1 className="mb-8 text-center">Start Chatting</h1>
           <div className="flex gap-4">
             <Button variant="solid" as="link" href="/rooms">
               Explore Chatts
@@ -55,23 +55,23 @@ function DashboardPage() {
             </Button>
           </div>
         </div>
-        <div className="flex flex-wrap gap-4 lg:gap-8 justify-center">
+        <div className="flex flex-wrap justify-center gap-4 lg:gap-8">
           {messagesQuery.data
             ? messagesQuery.data.chats.map((chat: ChatsType) => {
                 return (
                   <div
                     key={chat.id}
-                    className="bg-zinc-50 border border-zinc-950/15 px-4 py-6 rounded-md flex flex-col gap-6"
+                    className="flex flex-col gap-6 rounded-md border border-zinc-950/15 bg-zinc-50 px-4 py-6"
                   >
-                    <div className="flex justify-center items-center gap-4">
-                      <p className="w-12 h-12 flex justify-center items-center bg-zinc-200 text-zinc-900 rounded-full text-base">
+                    <div className="flex items-center justify-center gap-4">
+                      <p className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-200 text-base text-zinc-900">
                         {chat.chatLetters}
                       </p>
                       <div className="text-zinc-950">
-                        <p className="mb-1 capitalize w-[22ch] truncate">
+                        <p className="mb-1 w-[22ch] truncate capitalize">
                           {chat.chatname}
                         </p>
-                        <p className="text-mobxsp lg:text-deskxsp text-zinc-700">
+                        <p className="text-mobxsp text-zinc-700 lg:text-deskxsp">
                           {chat.numOfMembers} members
                         </p>
                       </div>

@@ -7,9 +7,9 @@ export const Route = createLazyFileRoute("/")({
 
 function Index() {
   return (
-    <main className="min-h-screen flex justify-center items-center p-4">
+    <main className="flex min-h-screen items-center justify-center p-4">
       <div className="flex flex-col items-center gap-12">
-        <div className="flex flex-col gap-4 items-center">
+        <div className="flex flex-col items-center gap-4">
           <h1 className="text-center">Welcome to ChattApp</h1>
           <p className="text-center">
             A simple chat app made for the odin project exercises.

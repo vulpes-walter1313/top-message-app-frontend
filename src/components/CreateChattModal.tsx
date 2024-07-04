@@ -51,14 +51,14 @@ function CreateChattModal({ isVisible, toggleVisible }: CreateChattModalProps) {
   if (isVisible) {
     return (
       <div
-        className="bg-zinc-950/70 fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center"
+        className="fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-zinc-950/70"
         onClick={() => {
           toggleVisible((bool) => !bool);
         }}
       >
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-zinc-50 p-6 border border-zinc-950/15 rounded-md space-y-4 w-11/12 max-w-sm"
+          className="w-11/12 max-w-sm space-y-4 rounded-md border border-zinc-950/15 bg-zinc-50 p-6"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex flex-col gap-2">
@@ -69,7 +69,7 @@ function CreateChattModal({ isVisible, toggleVisible }: CreateChattModalProps) {
               type="text"
               {...register("chatname")}
               placeholder="Team Rockett"
-              className="text-zinc-950 border border-zinc-300 text-mobsmp lg:text-desksmp px-3 py-2 rounded-md"
+              className="rounded-md border border-zinc-300 px-3 py-2 text-mobsmp text-zinc-950 lg:text-desksmp"
             />
             {errors.chatname ? (
               <ErrorMessage message={errors.chatname.message} />
@@ -83,7 +83,7 @@ function CreateChattModal({ isVisible, toggleVisible }: CreateChattModalProps) {
               type="text"
               {...register("chatTwoLetters")}
               placeholder="TR"
-              className="text-zinc-950 border border-zinc-300 text-mobsmp lg:text-desksmp px-3 py-2 rounded-md"
+              className="rounded-md border border-zinc-300 px-3 py-2 text-mobsmp text-zinc-950 lg:text-desksmp"
             />
             {errors.chatTwoLetters ? (
               <ErrorMessage message={errors.chatTwoLetters.message} />
@@ -97,7 +97,7 @@ function CreateChattModal({ isVisible, toggleVisible }: CreateChattModalProps) {
               type="text"
               {...register("chatDescription")}
               placeholder="What is this Chattroom about?"
-              className="text-zinc-950 border border-zinc-300 text-mobsmp lg:text-desksmp px-3 py-2 rounded-md"
+              className="rounded-md border border-zinc-300 px-3 py-2 text-mobsmp text-zinc-950 lg:text-desksmp"
             />
             {errors.chatDescription ? (
               <ErrorMessage message={errors.chatDescription.message} />

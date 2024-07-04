@@ -10,11 +10,11 @@ function PaginateButtons({ currentPage, totalPages }: PaginateButtonsProps) {
     pageNumbers.push(i);
   }
   return (
-    <div className="mx-auto max-w-96 flex flex-wrap gap-4 justify-center">
+    <div className="mx-auto flex max-w-96 flex-wrap justify-center gap-4">
       {pageNumbers.map((num) => (
         <button
           className={cn(
-            "bg-zinc-50 p-2 border border-zinc-950/15 rounded-md min-w-11 min-h-11",
+            "min-h-11 min-w-11 rounded-md border border-zinc-950/15 bg-zinc-50 p-2",
             { "bg-emerald-500 text-emerald-50": num === currentPage },
           )}
         >

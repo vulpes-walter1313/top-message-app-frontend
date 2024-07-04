@@ -3,8 +3,8 @@ type ErrorMessageProps = {
 };
 function ErrorMessage({ message }: ErrorMessageProps) {
   return (
-    <div className="w-full rounded-md shadow-sm bg-red-100 p-4">
-      <p className="text-mobxsp lg:text-deskxsp text-red-950">{message}</p>
+    <div className="w-full rounded-md bg-red-100 p-4 shadow-sm">
+      <p className="text-mobxsp text-red-950 lg:text-deskxsp">{message}</p>
     </div>
   );
 }

@@ -57,7 +57,7 @@ export default function RegisterForm() {
           type="text"
           {...register("name")}
           placeholder="Name"
-          className="border border-zinc-950/15 text-mobp lg:text-deskp rounded-md py-2 px-3"
+          className="rounded-md border border-zinc-950/15 px-3 py-2 text-mobp lg:text-deskp"
         />
         {errors.name ? <ErrorMessage message={errors.name.message} /> : null}
       </div>
@@ -69,7 +69,7 @@ export default function RegisterForm() {
           type="email"
           {...register("email")}
           placeholder="email@example.com"
-          className="border border-zinc-950/15 text-mobp lg:text-deskp rounded-md py-2 px-3"
+          className="rounded-md border border-zinc-950/15 px-3 py-2 text-mobp lg:text-deskp"
         />
         {errors.email ? <ErrorMessage message={errors.email.message} /> : null}
       </div>
@@ -81,7 +81,7 @@ export default function RegisterForm() {
           type="password"
           {...register("password")}
           placeholder="********"
-          className="border border-zinc-950/15 text-mobp lg:text-deskp rounded-md py-2 px-3"
+          className="rounded-md border border-zinc-950/15 px-3 py-2 text-mobp lg:text-deskp"
         />
         {errors.password ? (
           <ErrorMessage message={errors.password.message} />
@@ -95,7 +95,7 @@ export default function RegisterForm() {
           type="password"
           {...register("confirmPassword")}
           placeholder="********"
-          className="border border-zinc-950/15 text-mobp lg:text-deskp rounded-md py-2 px-3"
+          className="rounded-md border border-zinc-950/15 px-3 py-2 text-mobp lg:text-deskp"
         />
         {errors.confirmPassword ? (
           <ErrorMessage message={errors.confirmPassword.message} />
