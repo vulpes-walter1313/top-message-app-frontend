@@ -101,7 +101,7 @@ export default function RegisterForm() {
           <ErrorMessage message={errors.confirmPassword.message} />
         ) : null}
       </div>
-      <Button as="button" variant="solid">
+      <Button as="submit" variant="solid">
         Register
       </Button>
     </form>

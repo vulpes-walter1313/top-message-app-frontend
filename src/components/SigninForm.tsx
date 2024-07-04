@@ -69,7 +69,7 @@ export default function SigninForm() {
           <ErrorMessage message={errors.password.message} />
         ) : null}
       </div>
-      <Button as="button" variant="solid">
+      <Button as="submit" variant="solid">
         Sign In
       </Button>
     </form>

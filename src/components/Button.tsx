@@ -2,16 +2,28 @@ import React from "react";
 import { cn } from "../lib/utils";
 import { Link } from "@tanstack/react-router";
 
-type ButtonProps = {
-  as: "link" | "button";
-  children: React.ReactNode | string;
-  href?: string;
-  variant: "solid" | "outline";
-};
-export default function Button({ as, children, href, variant }: ButtonProps) {
+type ButtonProps =
+  | {
+      as: "link";
+      children: React.ReactNode | string;
+      href: string;
+      variant: "solid" | "outline";
+    }
+  | {
+      as: "submit";
+      children: string;
+      variant: "solid" | "outline";
+    }
+  | {
+      as: "toggle";
+      onClick: React.Dispatch<React.SetStateAction<boolean>>;
+      variant: "solid" | "outline";
+      children: string;
+    };
+export default function Button(props: ButtonProps) {
   let styles = "py-2 px-6 block leading-none";
 
-  switch (variant) {
+  switch (props.variant) {
     case "solid":
       styles = cn(
         styles,
@@ -27,17 +39,28 @@ export default function Button({ as, children, href, variant }: ButtonProps) {
     default:
       break;
   }
-  if (as === "link") {
+  if (props.as === "link") {
     return (
-      <Link to={href} className={styles}>
-        {children}
+      <Link to={props.href} className={styles}>
+        {props.children}
       </Link>
     );
   }
-  if (as === "button") {
+  if (props.as === "toggle") {
+    return (
+      <button
+        className={styles}
+        type="submit"
+        onClick={() => props.onClick((bool) => !bool)}
+      >
+        {props.children}
+      </button>
+    );
+  }
+  if (props.as === "submit") {
     return (
       <button className={styles} type="submit">
-        {children}
+        {props.children}
       </button>
     );
   }
