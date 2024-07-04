@@ -7,7 +7,6 @@ import Button from "./Button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createChattRoom } from "../lib/queryFunctions";
 
-
 const createChattFormSchema = z.object({
   chatname: z.string().min(3).max(32),
   chatTwoLetters: z.string().length(2).toUpperCase(),
@@ -28,15 +27,15 @@ type CreateChattModalProps = {
 function CreateChattModal({ isVisible, toggleVisible }: CreateChattModalProps) {
   // once /chat/:chatId is implemented use code below to navigate to it.
   // const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const creatChattMutation = useMutation({
     mutationFn: createChattRoom,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["chats", "joined"]})
+      queryClient.invalidateQueries({ queryKey: ["chats", "joined"] });
       toggleVisible(false);
-    }
-  })
+    },
+  });
   const {
     register,
     handleSubmit,
