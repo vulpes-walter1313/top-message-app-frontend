@@ -203,7 +203,7 @@ function ChatPage() {
             {chatInfoQuery.data ? (
               <>
                 <p className="text-zinc-950">
-                  {chatInfoQuery.data?.chatInfo?.chatDescription}
+                  {he.decode(chatInfoQuery.data?.chatInfo?.chatDescription)}
                 </p>
                 <p className="text-mobsmp text-zinc-600 lg:text-desksmp">
                   Chatt ID: {chatInfoQuery.data?.chatInfo?.id}
