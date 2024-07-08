@@ -18,7 +18,7 @@ type ChatsType = {
   numOfMembers: number;
 };
 function DashboardPage() {
-  const [createChattModalVisible, setCreateChattModalVisible] = useState(true);
+  const [createChattModalVisible, setCreateChattModalVisible] = useState(false);
   const messagesQuery = useQuery({
     queryKey: ["chats"],
     queryFn: async () => {
