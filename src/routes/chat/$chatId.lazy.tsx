@@ -1,11 +1,12 @@
 import { BsFillSendFill } from "react-icons/bs";
 import he from "he";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { Link, createLazyFileRoute } from "@tanstack/react-router";
 import {
   createChatMessage,
   getChatInfo,
   getChatMessages,
+  getJoinedChatsInfo,
 } from "../../lib/queryFunctions";
 import { DateTime } from "luxon";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -38,6 +39,15 @@ type ChatInfoResponseType = {
   chatInfo: ChatInfoType;
 };
 
+type ChatsType = {
+  id: string;
+  chatname: string;
+  chatLetters: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+  numOfMembers: number;
+};
+
 function ChatPage() {
   const { chatId } = Route.useParams();
   const queryClient = useQueryClient();
@@ -47,6 +57,11 @@ function ChatPage() {
       const res = await getChatInfo(chatId);
       return res;
     },
+  });
+
+  const myRoomsQuery = useQuery({
+    queryKey: ["chats"],
+    queryFn: getJoinedChatsInfo,
   });
 
   const messagesQuery = useQuery({
@@ -79,7 +94,7 @@ function ChatPage() {
   };
   return (
     <main className="min-h-screen bg-zinc-50">
-      <div className="my-6 flex flex-col items-center gap-4 px-4 lg:flex-row lg:items-start lg:justify-center">
+      <div className="flex flex-col items-center gap-4 px-4 py-6 lg:flex-row lg:items-start lg:justify-center">
         <div className="max-w-xl rounded-md border border-zinc-950/15 bg-white px-8 py-6">
           <div className="flex items-center gap-4 border-b border-zinc-950/15 pb-2">
             {chatInfoQuery.data ? (
@@ -183,7 +198,7 @@ function ChatPage() {
             </form>
           </div>
         </div>
-        <div>
+        <div className="flex flex-col gap-4">
           <div className="max-w-sm space-y-3 rounded-md border border-zinc-950/15 bg-white px-8 py-6">
             {chatInfoQuery.data ? (
               <>
@@ -206,7 +221,45 @@ function ChatPage() {
               <p>Error occurred, please refrash the page</p>
             ) : null}
           </div>
-          <div></div>
+          <div>
+            <div className="maz-w-sm rounded-md border border-zinc-950/15 bg-white px-8 py-6">
+              <p className="pb-4 font-medium">My Rooms</p>
+              <div className="flex flex-col gap-2">
+                {myRoomsQuery.data
+                  ? myRoomsQuery.data.chats.map((chat: ChatsType) => {
+                      return (
+                        <Link
+                          key={chat.id}
+                          to="/chat/$chatId"
+                          params={{ chatId: chat.id }}
+                        >
+                          <div
+                            key={chat.id}
+                            className="group:bg-emerald-300 flex items-center gap-4 rounded-md bg-zinc-100 px-4 py-2 hover:bg-white"
+                          >
+                            <p className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-200 text-base text-zinc-900">
+                              {chat.chatLetters}
+                            </p>
+                            <div className="text-zinc-950">
+                              <p className="mb-1 w-[22ch] truncate capitalize">
+                                {chat.chatname}
+                              </p>
+                              <p className="text-deskxsp text-zinc-700">
+                                {chat.numOfMembers} members
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })
+                  : null}
+                {myRoomsQuery.isLoading ? <p>Loading...</p> : null}
+                {myRoomsQuery.isError ? (
+                  <ErrorMessage message="There was an error loading your ChattRooms" />
+                ) : null}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
