@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import PaginateButtons from "../components/PaginateButtons";
 import { useState } from "react";
 import CreateChattModal from "../components/CreateChattModal";
+import { getJoinedChatsInfo } from "../lib/queryFunctions";
 
 export const Route = createLazyFileRoute("/dashboard")({
   component: DashboardPage,
@@ -21,21 +22,7 @@ function DashboardPage() {
   const [createChattModalVisible, setCreateChattModalVisible] = useState(false);
   const messagesQuery = useQuery({
     queryKey: ["chats"],
-    queryFn: async () => {
-      const rawRes = await fetch(
-        "http://localhost:3000/chats?type=joined&limit=10&page=1",
-        {
-          method: "GET",
-          credentials: "include",
-        },
-      );
-      const res = await rawRes.json();
-      if (res.success) {
-        return res;
-      } else {
-        throw new Error("Error in fetching joined chats");
-      }
-    },
+    queryFn: getJoinedChatsInfo,
   });
   return (
     <main className="w-full">
