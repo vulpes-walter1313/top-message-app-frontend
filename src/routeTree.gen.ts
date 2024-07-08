@@ -21,6 +21,7 @@ const RegisterLazyImport = createFileRoute('/register')()
 const DashboardLazyImport = createFileRoute('/dashboard')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
+const ChatChatIdLazyImport = createFileRoute('/chat/$chatId')()
 
 // Create/Update Routes
 
@@ -48,6 +49,11 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const ChatChatIdLazyRoute = ChatChatIdLazyImport.update({
+  path: '/chat/$chatId',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/chat/$chatId.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
@@ -88,6 +94,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninLazyImport
       parentRoute: typeof rootRoute
     }
+    '/chat/$chatId': {
+      id: '/chat/$chatId'
+      path: '/chat/$chatId'
+      fullPath: '/chat/$chatId'
+      preLoaderRoute: typeof ChatChatIdLazyImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -99,6 +112,7 @@ export const routeTree = rootRoute.addChildren({
   DashboardLazyRoute,
   RegisterLazyRoute,
   SigninLazyRoute,
+  ChatChatIdLazyRoute,
 })
 
 /* prettier-ignore-end */
@@ -113,7 +127,8 @@ export const routeTree = rootRoute.addChildren({
         "/about",
         "/dashboard",
         "/register",
-        "/signin"
+        "/signin",
+        "/chat/$chatId"
       ]
     },
     "/": {
@@ -130,6 +145,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/signin": {
       "filePath": "signin.lazy.tsx"
+    },
+    "/chat/$chatId": {
+      "filePath": "chat/$chatId.lazy.tsx"
     }
   }
 }
