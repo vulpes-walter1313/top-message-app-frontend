@@ -169,7 +169,8 @@ function ChatPage() {
                               message.createdAt!,
                             ).toLocaleString(DateTime.DATETIME_MED)}
                           </p>
-                          {message.authorIsUser ? (
+                          {message.authorIsUser ||
+                          chatInfoQuery.data.userIsAdmin ? (
                             <button
                               className="text-right text-deskxsp font-medium text-red-600"
                               type="button"
