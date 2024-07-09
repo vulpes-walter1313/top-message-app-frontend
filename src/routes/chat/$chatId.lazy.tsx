@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createLazyFileRoute } from "@tanstack/react-router";
 import {
   createChatMessage,
+  deleteMessage,
   getChatInfo,
   getChatMessages,
   getJoinedChatsInfo,
@@ -74,6 +75,13 @@ function ChatPage() {
 
   const sendMessageMutation = useMutation({
     mutationFn: createChatMessage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
+    },
+  });
+
+  const deleteMessageMutation = useMutation({
+    mutationFn: deleteMessage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
     },
@@ -161,6 +169,20 @@ function ChatPage() {
                               message.createdAt!,
                             ).toLocaleString(DateTime.DATETIME_MED)}
                           </p>
+                          {message.authorIsUser ? (
+                            <button
+                              className="text-right text-deskxsp font-medium text-red-600"
+                              type="button"
+                              onClick={() =>
+                                deleteMessageMutation.mutate({
+                                  chatId: chatId,
+                                  messageId: message.id,
+                                })
+                              }
+                            >
+                              delete
+                            </button>
+                          ) : null}
                         </div>
                       </div>
                     );
@@ -235,7 +257,11 @@ function ChatPage() {
                         >
                           <div
                             key={chat.id}
-                            className="group:bg-emerald-300 flex items-center gap-4 rounded-md bg-zinc-100 px-4 py-2 hover:bg-white"
+                            className={cn(
+                              "flex items-center gap-4 rounded-md bg-zinc-100 px-4 py-2 hover:bg-white",
+                              chatId === chat.id &&
+                                "border-2 border-emerald-500",
+                            )}
                           >
                             <p className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-200 text-base text-zinc-900">
                               {chat.chatLetters}

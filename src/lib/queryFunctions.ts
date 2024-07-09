@@ -30,6 +30,28 @@ export async function createChattRoom({
   }
 }
 
+export async function deleteMessage({
+  chatId,
+  messageId,
+}: {
+  chatId: string;
+  messageId: string;
+}) {
+  const rawRes = await fetch(
+    `http://localhost:3000/chats/${chatId}/messages/${messageId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    },
+  );
+  const res = await rawRes.json();
+  if (res.success) {
+    return res;
+  } else {
+    throw new Error("Error is deleting message");
+  }
+}
+
 export async function getChatInfo(chatId: string) {
   const rawRes = await fetch(`http://localhost:3000/chats/${chatId}`, {
     method: "GET",
