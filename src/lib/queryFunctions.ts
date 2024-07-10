@@ -30,6 +30,23 @@ export async function createChattRoom({
   }
 }
 
+export async function joinChat({ chatId }: { chatId: string }) {
+  const rawRes = await fetch(
+    `http://localhost:3000/chats/${chatId}/membership`,
+    {
+      method: "GET",
+      credentials: "include",
+    },
+  );
+
+  const res = await rawRes.json();
+  if (res.success) {
+    return res;
+  } else {
+    throw new Error("Error in joining chatt");
+  }
+}
+
 export async function deleteMessage({
   chatId,
   messageId,
@@ -78,6 +95,22 @@ export async function getJoinedChatsInfo() {
     return res;
   } else {
     throw new Error("Error in fetching joined chats");
+  }
+}
+
+export async function getExploreChatsInfo(page: number) {
+  const rawRes = await fetch(
+    `http://localhost:3000/chats?type=explore&limit=10&page=${page}`,
+    {
+      method: "GET",
+      credentials: "include",
+    },
+  );
+  const res = await rawRes.json();
+  if (res.success) {
+    return res;
+  } else {
+    throw new Error("Error is fetching explore chats info");
   }
 }
 
