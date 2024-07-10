@@ -19,10 +19,14 @@ type ChatsType = {
   numOfMembers: number;
 };
 function DashboardPage() {
+  const [selectedPage, setSelectedPage] = useState(1);
   const [createChattModalVisible, setCreateChattModalVisible] = useState(false);
   const messagesQuery = useQuery({
-    queryKey: ["chats"],
-    queryFn: getJoinedChatsInfo,
+    queryKey: ["chats", "joined", selectedPage],
+    queryFn: async () => {
+      const res = await getJoinedChatsInfo(selectedPage);
+      return res;
+    },
   });
   return (
     <main className="w-full">
@@ -76,6 +80,7 @@ function DashboardPage() {
           <PaginateButtons
             currentPage={messagesQuery.data.currentPage}
             totalPages={messagesQuery.data.totalPages}
+            setDesiredPage={setSelectedPage}
           />
         ) : null}
       </div>
