@@ -66,15 +66,16 @@ function ChatInfoModal({
                   navigate({
                     to: "/chat/$chatId",
                     params: {
-                      chatId: chatQuery.data.chatInfo.id
-                    }
-                  })
-                }
-                }
+                      chatId: chatQuery.data.chatInfo.id,
+                    },
+                  });
+                }}
               >
                 Join Chatt
               </button>
-              {joinChatMutation.isError ? <ErrorMessage message="Problem in joining chat. try again later."/> : null}
+              {joinChatMutation.isError ? (
+                <ErrorMessage message="Problem in joining chat. try again later." />
+              ) : null}
             </div>
           ) : null}
         </div>
