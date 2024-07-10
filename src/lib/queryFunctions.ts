@@ -69,6 +69,36 @@ export async function deleteMessage({
   }
 }
 
+export async function deleteChatMembership({ chatId }: { chatId: string }) {
+  const rawRes = await fetch(
+    `http://localhost:3000/chats/${chatId}/membership`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    },
+  );
+  const res = await rawRes.json();
+
+  if (res.success) {
+    return res;
+  } else {
+    throw new Error("Error is deleting membership to chatt");
+  }
+}
+
+export async function deleteChat({ chatId }: { chatId: string }) {
+  const rawRes = await fetch(`http://localhost:3000/chats/${chatId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  const res = await rawRes.json();
+  if (res.success) {
+    return res;
+  } else {
+    throw new Error("Error in deleting chat");
+  }
+}
+
 export async function getChatInfo(chatId: string) {
   const rawRes = await fetch(`http://localhost:3000/chats/${chatId}`, {
     method: "GET",

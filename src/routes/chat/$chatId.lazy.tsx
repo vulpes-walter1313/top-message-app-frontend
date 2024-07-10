@@ -1,9 +1,11 @@
 import { BsFillSendFill } from "react-icons/bs";
 import he from "he";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, createLazyFileRoute } from "@tanstack/react-router";
+import { Link, createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   createChatMessage,
+  deleteChat,
+  deleteChatMembership,
   deleteMessage,
   getChatInfo,
   getChatMessages,
@@ -52,6 +54,7 @@ type ChatsType = {
 };
 
 function ChatPage() {
+  const navigate = useNavigate();
   const { chatId } = Route.useParams();
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
@@ -90,6 +93,26 @@ function ChatPage() {
     mutationFn: deleteMessage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
+    },
+  });
+
+  const deleteMembershipMutation = useMutation({
+    mutationFn: deleteChatMembership,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chats", "joined"] });
+      navigate({
+        to: "/dashboard",
+      });
+    },
+  });
+
+  const deleteChatMutation = useMutation({
+    mutationFn: deleteChat,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chats", "joined"] });
+      navigate({
+        to: "/dashboard",
+      });
     },
   });
 
@@ -241,12 +264,45 @@ function ChatPage() {
                   Chatt Admin: {chatInfoQuery.data?.chatInfo?.adminName}
                 </p>
 
-                <button
-                  type="button"
-                  className="rounded-full bg-red-600 px-6 py-2 text-mobp font-semibold text-zinc-50 lg:text-deskp lg:font-semibold"
-                >
-                  Exit Room
-                </button>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    className="rounded-full bg-red-600 px-6 py-2 text-mobp font-semibold text-zinc-50 lg:text-deskp lg:font-semibold"
+                    onClick={() => {
+                      const confirmation = confirm(
+                        "Are you sure you want to exit this chat?",
+                      );
+                      if (confirmation) {
+                        deleteMembershipMutation.mutate({
+                          chatId: chatInfoQuery.data.chatInfo.id,
+                        });
+                      }
+                    }}
+                  >
+                    Exit Room
+                  </button>
+                  {chatInfoQuery.data.userIsAdmin ? (
+                    <button
+                      type="button"
+                      className="block rounded-full border-2 border-red-500 px-6 py-2 text-lg font-semibold leading-none text-red-500"
+                      onClick={() => {
+                        const confirmation = confirm(
+                          "are you sure you want to delete this chat?",
+                        );
+                        if (confirmation) {
+                          deleteChatMutation.mutate({
+                            chatId: chatInfoQuery.data.chatInfo.id,
+                          });
+                        }
+                      }}
+                    >
+                      Delete Chat
+                    </button>
+                  ) : null}
+                </div>
+                {deleteMembershipMutation.isError ? (
+                  <ErrorMessage message="Error in exiting chatt" />
+                ) : null}
               </>
             ) : null}
             {chatInfoQuery.isLoading ? <p>Loading...</p> : null}
