@@ -29,10 +29,10 @@ function CreateChattModal({ isVisible, toggleVisible }: CreateChattModalProps) {
   // const navigate = useNavigate()
   const queryClient = useQueryClient();
 
-  const creatChattMutation = useMutation({
+  const createChattMutation = useMutation({
     mutationFn: createChattRoom,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chats", "joined"] });
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
       toggleVisible(false);
     },
   });
@@ -45,7 +45,7 @@ function CreateChattModal({ isVisible, toggleVisible }: CreateChattModalProps) {
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    creatChattMutation.mutate(data);
+    createChattMutation.mutate(data);
   };
 
   if (isVisible) {
