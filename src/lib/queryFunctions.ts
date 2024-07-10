@@ -82,9 +82,9 @@ export async function getChatInfo(chatId: string) {
   }
 }
 
-export async function getJoinedChatsInfo() {
+export async function getJoinedChatsInfo(page: number) {
   const rawRes = await fetch(
-    "http://localhost:3000/chats?type=joined&limit=10&page=1",
+    `http://localhost:3000/chats?type=joined&limit=10&page=${page}`,
     {
       method: "GET",
       credentials: "include",

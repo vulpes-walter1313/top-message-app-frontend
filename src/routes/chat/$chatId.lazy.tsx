@@ -15,6 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import ErrorMessage from "../../components/ErrorMessage";
 import { cn } from "../../lib/utils";
+import { useState } from "react";
+import PaginateButtons from "../../components/PaginateButtons";
 
 export const Route = createLazyFileRoute("/chat/$chatId")({
   component: ChatPage,
@@ -51,6 +53,7 @@ type ChatsType = {
 
 function ChatPage() {
   const { chatId } = Route.useParams();
+  const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
   const chatInfoQuery = useQuery({
     queryKey: ["chat", chatId],
@@ -61,8 +64,11 @@ function ChatPage() {
   });
 
   const myRoomsQuery = useQuery({
-    queryKey: ["chats"],
-    queryFn: getJoinedChatsInfo,
+    queryKey: ["chats", "joined", page],
+    queryFn: async () => {
+      const res = await getJoinedChatsInfo(page);
+      return res;
+    },
   });
 
   const messagesQuery = useQuery({
@@ -231,6 +237,10 @@ function ChatPage() {
                 <p className="text-mobsmp text-zinc-600 lg:text-desksmp">
                   Chatt ID: {chatInfoQuery.data?.chatInfo?.id}
                 </p>
+                <p className="text-mobsmp text-zinc-600 lg:text-desksmp">
+                  Chatt Admin: {chatInfoQuery.data?.chatInfo?.adminName}
+                </p>
+
                 <button
                   type="button"
                   className="rounded-full bg-red-600 px-6 py-2 text-mobp font-semibold text-zinc-50 lg:text-deskp lg:font-semibold"
@@ -285,6 +295,15 @@ function ChatPage() {
                   <ErrorMessage message="There was an error loading your ChattRooms" />
                 ) : null}
               </div>
+              {myRoomsQuery.data ? (
+                <div className="pt-4">
+                  <PaginateButtons
+                    currentPage={myRoomsQuery.data.currentPage}
+                    totalPages={myRoomsQuery.data.totalPages}
+                    setDesiredPage={setPage}
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
