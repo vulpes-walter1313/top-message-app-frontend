@@ -19,6 +19,12 @@ type ButtonProps =
       onClick: React.Dispatch<React.SetStateAction<boolean>>;
       variant: "solid" | "outline";
       children: string;
+    }
+  | {
+      as: "button";
+      onClick: React.MouseEventHandler<HTMLButtonElement>;
+      variant: "solid" | "outline";
+      children: string;
     };
 export default function Button(props: ButtonProps) {
   let styles = "py-2 px-6 block leading-none";
@@ -60,6 +66,13 @@ export default function Button(props: ButtonProps) {
   if (props.as === "submit") {
     return (
       <button className={styles} type="submit">
+        {props.children}
+      </button>
+    );
+  }
+  if (props.as === "button") {
+    return (
+      <button className={styles} type="button" onClick={props.onClick}>
         {props.children}
       </button>
     );
