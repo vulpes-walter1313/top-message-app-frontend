@@ -185,3 +185,31 @@ export async function createChatMessage({
     throw new Error("Error is sending message to chat.");
   }
 }
+
+// Get User query
+
+export async function getUserStatus() {
+  const rawRes = await fetch("http://localhost:3000/user", {
+    method: "GET",
+    credentials: "include",
+  });
+  const res = await rawRes.json();
+  if (res.success) {
+    return res;
+  } else {
+    throw new Error("Couldn't fetch user status");
+  }
+}
+
+export async function logoutUser() {
+  const rawRes = await fetch("http://localhost:3000/signout", {
+    method: "DELETE",
+    credentials: "include",
+  });
+  const res = await rawRes.json();
+  if (res.success) {
+    return res;
+  } else {
+    throw new Error("Error in signing out");
+  }
+}

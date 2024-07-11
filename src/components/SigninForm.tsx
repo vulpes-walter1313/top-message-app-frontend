@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "./Button";
 import ErrorMessage from "./ErrorMessage";
 import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 
 const SigninFormSchema = z.object({
   email: z.string().email(),
@@ -15,6 +16,7 @@ type Inputs = {
 };
 
 export default function SigninForm() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const {
     register,
@@ -36,7 +38,8 @@ export default function SigninForm() {
     const res = await rawRes.json();
     console.log(res);
     if (res.success) {
-      navigate({ to: "/" });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate({ to: "/dashboard" });
     } else {
       alert("sign in failed. please try again");
     }
