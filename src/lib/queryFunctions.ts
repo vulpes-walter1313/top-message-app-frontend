@@ -128,9 +128,9 @@ export async function getJoinedChatsInfo(page: number) {
   }
 }
 
-export async function getExploreChatsInfo(page: number) {
+export async function getExploreChatsInfo(page: number, query: string) {
   const rawRes = await fetch(
-    `http://localhost:3000/chats?type=explore&limit=10&page=${page}`,
+    `http://localhost:3000/chats?type=explore&limit=10&page=${page}&search=${query}`,
     {
       method: "GET",
       credentials: "include",

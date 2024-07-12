@@ -6,6 +6,7 @@ import Button from "../components/Button";
 import PaginateButtons from "../components/PaginateButtons";
 import CreateChattModal from "../components/CreateChattModal";
 import ChatInfoModal from "../components/ChatInfoModal";
+import { useDebouncedCallback } from "use-debounce";
 
 export const Route = createLazyFileRoute("/rooms")({
   component: RoomsPage,
@@ -19,15 +20,21 @@ type ChatsType = {
   updatedAt: string | null;
   numOfMembers: number;
 };
+
 function RoomsPage() {
   const [createChattModalVisible, setCreateChattModalVisible] = useState(false);
   const [chatInfoModalVisible, setChatInfoModalVisible] = useState(false);
   const [selectedChat, setSelectedChat] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const setSearchQueryDebounced = useDebouncedCallback((value: string) => {
+    setSearchQuery(value);
+    console.log("set value debounced");
+  }, 1000);
   const [page, setPage] = useState(1);
   const messagesQuery = useQuery({
-    queryKey: ["chats", "explore", "page", page],
+    queryKey: ["chats", "explore", `q-${searchQuery}`, "page", page],
     queryFn: async () => {
-      const res = await getExploreChatsInfo(page);
+      const res = await getExploreChatsInfo(page, searchQuery);
       if (res.success) {
         return res;
       } else {
@@ -40,7 +47,14 @@ function RoomsPage() {
       <div className="flex flex-col justify-center gap-16">
         <div className="mx-auto mt-10 max-w-3xl lg:mt-20">
           <h1 className="mb-8 text-center">Find a Chatt Room!</h1>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col justify-center gap-4 lg:flex-row">
+            <input
+              aria-label="Search chats by name or id input"
+              type="text"
+              placeholder="Search by name or id"
+              className="rounded-full border border-zinc-950/15 px-4 py-2 text-deskp"
+              onChange={(e) => setSearchQueryDebounced(e.target.value)}
+            />
             <Button variant="solid" as="link" href="/dashboard">
               See Joined Chatts
             </Button>
