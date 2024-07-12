@@ -44,7 +44,7 @@ function Navbar() {
       </div>
       <ul
         className={cn(
-          "absolute left-0 top-[64px] flex h-[calc(100vh-64px)] w-screen -translate-x-full flex-col items-center justify-center gap-8 bg-transparent bg-zinc-50 transition-transform duration-300 ease-out lg:static lg:h-auto lg:w-auto lg:translate-x-0 lg:flex-row",
+          "absolute left-0 top-[64px] flex h-[calc(100vh-64px)] w-screen -translate-x-full flex-col items-center justify-center gap-8 bg-zinc-50 transition-transform duration-300 ease-out lg:static lg:h-auto lg:w-auto lg:translate-x-0 lg:flex-row lg:bg-transparent",
           mobileMenuVisible && "translate-x-0",
         )}
       >
