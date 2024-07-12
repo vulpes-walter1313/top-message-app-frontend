@@ -80,7 +80,7 @@ function ChatPage() {
       const res = await getChatMessages(chatId);
       return res;
     },
-    refetchInterval: 2000
+    refetchInterval: 2000,
   });
 
   const sendMessageMutation = useMutation({
