@@ -91,11 +91,13 @@ function RoomsPage() {
         </div>
         {messagesQuery.isLoading ? <p>Loading...</p> : null}
         {messagesQuery.data ? (
-          <PaginateButtons
-            currentPage={messagesQuery.data.currentPage}
-            totalPages={messagesQuery.data.totalPages}
-            setDesiredPage={setPage}
-          />
+          <div className="pb-14">
+            <PaginateButtons
+              currentPage={messagesQuery.data.currentPage}
+              totalPages={messagesQuery.data.totalPages}
+              setDesiredPage={setPage}
+            />
+          </div>
         ) : null}
       </div>
       <CreateChattModal

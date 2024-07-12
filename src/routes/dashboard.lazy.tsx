@@ -77,11 +77,13 @@ function DashboardPage() {
         </div>
         {messagesQuery.isLoading ? <p>Loading...</p> : null}
         {messagesQuery.data ? (
-          <PaginateButtons
-            currentPage={messagesQuery.data.currentPage}
-            totalPages={messagesQuery.data.totalPages}
-            setDesiredPage={setSelectedPage}
-          />
+          <div className="pb-14">
+            <PaginateButtons
+              currentPage={messagesQuery.data.currentPage}
+              totalPages={messagesQuery.data.totalPages}
+              setDesiredPage={setSelectedPage}
+            />
+          </div>
         ) : null}
       </div>
       <CreateChattModal
