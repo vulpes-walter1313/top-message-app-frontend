@@ -28,7 +28,7 @@ function Navbar() {
 
   return (
     <nav className="flex items-center justify-between px-5 py-4 lg:px-16">
-      <p>ChattApp</p>
+      <p className="text-deskh6 font-semibold">ChattApp</p>
       <div className="lg:hidden">
         {mobileMenuVisible ? (
           <IoIosClose
@@ -47,6 +47,7 @@ function Navbar() {
           "absolute left-0 top-[64px] flex h-[calc(100vh-64px)] w-screen -translate-x-full flex-col items-center justify-center gap-8 bg-zinc-50 transition-transform duration-300 ease-out lg:static lg:h-auto lg:w-auto lg:translate-x-0 lg:flex-row lg:bg-transparent",
           mobileMenuVisible && "translate-x-0",
         )}
+        onClick={() => setMobileMenuVisible((bool) => !bool)}
       >
         {userQuery.data && userQuery.isSuccess ? (
           <>
