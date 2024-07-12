@@ -42,7 +42,7 @@ export default function RegisterForm() {
     const res = await rawRes.json();
     console.log(res);
     if (res.success) {
-      navigate({ to: "/" });
+      navigate({ to: "/signin" });
     } else {
       alert("Registration failed. please try again");
     }
