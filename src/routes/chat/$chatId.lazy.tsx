@@ -133,7 +133,7 @@ function ChatPage() {
   return (
     <main className="min-h-screen bg-zinc-50">
       <div className="flex flex-col items-center gap-4 px-4 py-6 lg:flex-row lg:items-start lg:justify-center">
-        <div className="max-w-xl rounded-md border border-zinc-950/15 bg-white px-8 py-6">
+        <div className="max-w-xl rounded-md border border-zinc-950/15 bg-white px-8 py-6 lg:w-[29.5rem]">
           <div className="flex items-center gap-4 border-b border-zinc-950/15 pb-2">
             {chatInfoQuery.data ? (
               <>
@@ -232,6 +232,12 @@ function ChatPage() {
                   {...register("content")}
                   rows={4}
                   className="w-full border border-zinc-950/15 text-mobp text-zinc-900 lg:text-deskp"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && e.shiftKey == false) {
+                      e.preventDefault();
+                      handleSubmit(onSubmit)();
+                    }
+                  }}
                 />
                 {errors.content ? (
                   <ErrorMessage message={errors.content.message} />
