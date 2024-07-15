@@ -28,7 +28,6 @@ function RoomsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const setSearchQueryDebounced = useDebouncedCallback((value: string) => {
     setSearchQuery(value);
-    console.log("set value debounced");
   }, 1000);
   const [page, setPage] = useState(1);
   const messagesQuery = useQuery({

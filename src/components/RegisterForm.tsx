@@ -40,7 +40,6 @@ export default function RegisterForm() {
       body: jsonBody,
     });
     const res = await rawRes.json();
-    console.log(res);
     if (res.success) {
       navigate({ to: "/signin" });
     } else {

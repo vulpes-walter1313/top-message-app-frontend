@@ -126,7 +126,6 @@ function ChatPage() {
     resolver: zodResolver(MessageFormSchema),
   });
   const onSubmit: SubmitHandler<MessageInput> = async (data) => {
-    console.log(data);
     sendMessageMutation.mutate({ chatId, content: data.content });
     reset();
   };

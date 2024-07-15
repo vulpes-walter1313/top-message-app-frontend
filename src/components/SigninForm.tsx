@@ -36,7 +36,6 @@ export default function SigninForm() {
       body: jsonBody,
     });
     const res = await rawRes.json();
-    console.log(res);
     if (res.success) {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate({ to: "/dashboard" });

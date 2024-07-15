@@ -22,7 +22,6 @@ export async function createChattRoom({
     body: jsonBody,
   });
   const res = await rawRes.json();
-  console.log(res);
   if (res.success) {
     return res;
   } else {
