@@ -23,6 +23,7 @@ function PaginateButtons({
             { "bg-emerald-500 text-emerald-50": num === currentPage },
           )}
           onClick={() => setDesiredPage(num)}
+          key={num}
         >
           {num}
         </button>
