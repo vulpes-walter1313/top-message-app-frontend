@@ -1,3 +1,4 @@
+import { getBackendUrl } from "./utils";
 type CreateChattRoomProps = {
   chatname: string;
   chatTwoLetters: string;
@@ -13,7 +14,7 @@ export async function createChattRoom({
     chatTwoLetters,
     chatDescription,
   });
-  const rawRes = await fetch("http://localhost:3000/chats", {
+  const rawRes = await fetch(`${getBackendUrl()}/chats`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -30,13 +31,10 @@ export async function createChattRoom({
 }
 
 export async function joinChat({ chatId }: { chatId: string }) {
-  const rawRes = await fetch(
-    `http://localhost:3000/chats/${chatId}/membership`,
-    {
-      method: "GET",
-      credentials: "include",
-    },
-  );
+  const rawRes = await fetch(`${getBackendUrl()}/chats/${chatId}/membership`, {
+    method: "GET",
+    credentials: "include",
+  });
 
   const res = await rawRes.json();
   if (res.success) {
@@ -54,7 +52,7 @@ export async function deleteMessage({
   messageId: string;
 }) {
   const rawRes = await fetch(
-    `http://localhost:3000/chats/${chatId}/messages/${messageId}`,
+    `${getBackendUrl()}/chats/${chatId}/messages/${messageId}`,
     {
       method: "DELETE",
       credentials: "include",
@@ -69,13 +67,10 @@ export async function deleteMessage({
 }
 
 export async function deleteChatMembership({ chatId }: { chatId: string }) {
-  const rawRes = await fetch(
-    `http://localhost:3000/chats/${chatId}/membership`,
-    {
-      method: "DELETE",
-      credentials: "include",
-    },
-  );
+  const rawRes = await fetch(`${getBackendUrl()}/chats/${chatId}/membership`, {
+    method: "DELETE",
+    credentials: "include",
+  });
   const res = await rawRes.json();
 
   if (res.success) {
@@ -86,7 +81,7 @@ export async function deleteChatMembership({ chatId }: { chatId: string }) {
 }
 
 export async function deleteChat({ chatId }: { chatId: string }) {
-  const rawRes = await fetch(`http://localhost:3000/chats/${chatId}`, {
+  const rawRes = await fetch(`${getBackendUrl()}/chats/${chatId}`, {
     method: "DELETE",
     credentials: "include",
   });
@@ -99,7 +94,7 @@ export async function deleteChat({ chatId }: { chatId: string }) {
 }
 
 export async function getChatInfo(chatId: string) {
-  const rawRes = await fetch(`http://localhost:3000/chats/${chatId}`, {
+  const rawRes = await fetch(`${getBackendUrl()}/chats/${chatId}`, {
     method: "GET",
     credentials: "include",
   });
@@ -113,7 +108,7 @@ export async function getChatInfo(chatId: string) {
 
 export async function getJoinedChatsInfo(page: number) {
   const rawRes = await fetch(
-    `http://localhost:3000/chats?type=joined&limit=10&page=${page}`,
+    `${getBackendUrl()}/chats?type=joined&limit=10&page=${page}`,
     {
       method: "GET",
       credentials: "include",
@@ -129,7 +124,7 @@ export async function getJoinedChatsInfo(page: number) {
 
 export async function getExploreChatsInfo(page: number, query: string) {
   const rawRes = await fetch(
-    `http://localhost:3000/chats?type=explore&limit=10&page=${page}&search=${query}`,
+    `${getBackendUrl()}/chats?type=explore&limit=10&page=${page}&search=${query}`,
     {
       method: "GET",
       credentials: "include",
@@ -145,7 +140,7 @@ export async function getExploreChatsInfo(page: number, query: string) {
 
 export async function getChatMessages(chatId: string) {
   const rawRes = await fetch(
-    `http://localhost:3000/chats/${chatId}/messages?limit=50&page=1`,
+    `${getBackendUrl()}/chats/${chatId}/messages?limit=50&page=1`,
     {
       method: "GET",
       credentials: "include",
@@ -169,7 +164,7 @@ export async function createChatMessage({
   content,
 }: CreateChatMessateProps) {
   const data = { content };
-  const rawRes = await fetch(`http://localhost:3000/chats/${chatId}/messages`, {
+  const rawRes = await fetch(`${getBackendUrl()}/chats/${chatId}/messages`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -188,7 +183,7 @@ export async function createChatMessage({
 // Get User query
 
 export async function getUserStatus() {
-  const rawRes = await fetch("http://localhost:3000/user", {
+  const rawRes = await fetch(`${getBackendUrl()}/user`, {
     method: "GET",
     credentials: "include",
   });
@@ -201,7 +196,7 @@ export async function getUserStatus() {
 }
 
 export async function logoutUser() {
-  const rawRes = await fetch("http://localhost:3000/signout", {
+  const rawRes = await fetch(`${getBackendUrl()}/signout`, {
     method: "DELETE",
     credentials: "include",
   });
