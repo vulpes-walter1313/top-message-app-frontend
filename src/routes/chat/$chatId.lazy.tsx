@@ -98,7 +98,6 @@ function ChatPage() {
 
       const previousMessages = queryClient.getQueryData(["messages", chatId]);
 
-      // @ts-expect-error old is implicit any
       queryClient.setQueryData(["messages", chatId], (old) => {
         const newData = structuredClone(old);
         // @ts-expect-error type issue
@@ -114,7 +113,7 @@ function ChatPage() {
       });
       return { previousMessages };
     },
-    onError: (err, newMessage, context) => {
+    onError: (_err, _newMessage, context) => {
       queryClient.setQueryData(["messages", chatId], context?.previousMessages);
     },
     onSettled: () => {
