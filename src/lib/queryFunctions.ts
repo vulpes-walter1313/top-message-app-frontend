@@ -155,14 +155,14 @@ export async function getChatMessages(chatId: string) {
   }
 }
 
-type CreateChatMessateProps = {
+type CreateChatMessageProps = {
   chatId: string;
   content: string;
 };
 export async function createChatMessage({
   chatId,
   content,
-}: CreateChatMessateProps) {
+}: CreateChatMessageProps) {
   const data = { content };
   const rawRes = await fetch(`${getBackendUrl()}/chats/${chatId}/messages`, {
     method: "POST",
