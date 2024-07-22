@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "./Button";
 import ErrorMessage from "./ErrorMessage";
 import { useNavigate } from "@tanstack/react-router";
+import { getBackendUrl } from "../lib/utils";
 
 const RegisterFormSchema = z
   .object({
@@ -31,7 +32,7 @@ export default function RegisterForm() {
   });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const jsonBody = JSON.stringify(data);
-    const rawRes = await fetch("http://localhost:3000/register", {
+    const rawRes = await fetch(`${getBackendUrl()}/register`, {
       method: "POST",
       credentials: "include",
       headers: {

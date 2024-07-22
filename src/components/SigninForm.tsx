@@ -5,6 +5,7 @@ import Button from "./Button";
 import ErrorMessage from "./ErrorMessage";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { getBackendUrl } from "../lib/utils";
 
 const SigninFormSchema = z.object({
   email: z.string().email(),
@@ -27,7 +28,7 @@ export default function SigninForm() {
   });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const jsonBody = JSON.stringify(data);
-    const rawRes = await fetch("http://localhost:3000/signin", {
+    const rawRes = await fetch(`${getBackendUrl()}/signin`, {
       method: "POST",
       credentials: "include",
       headers: {
