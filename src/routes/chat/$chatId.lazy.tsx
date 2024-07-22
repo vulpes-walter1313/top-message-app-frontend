@@ -10,6 +10,7 @@ import {
   getChatInfo,
   getChatMessages,
   getJoinedChatsInfo,
+  getUserStatus,
 } from "../../lib/queryFunctions";
 import { DateTime } from "luxon";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -58,6 +59,10 @@ function ChatPage() {
   const { chatId } = Route.useParams();
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
+  const userQuery = useQuery({
+    queryKey: ["user"],
+    queryFn: getUserStatus,
+  });
   const chatInfoQuery = useQuery({
     queryKey: ["chat", chatId],
     queryFn: async () => {
@@ -80,12 +85,39 @@ function ChatPage() {
       const res = await getChatMessages(chatId);
       return res;
     },
-    refetchInterval: 2000,
+    refetchInterval: 5000,
   });
 
   const sendMessageMutation = useMutation({
     mutationFn: createChatMessage,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
+    },
+    onMutate: async (newMessage) => {
+      await queryClient.cancelQueries({ queryKey: ["messages", chatId] });
+
+      const previousMessages = queryClient.getQueryData(["messages", chatId]);
+
+      // @ts-expect-error old is implicit any
+      queryClient.setQueryData(["messages", chatId], (old) => {
+        const newData = structuredClone(old);
+        // @ts-expect-error type issue
+        newData.messages.unshift({
+          author: userQuery.data.userName ?? "You",
+          authorIsUser: true,
+          content: newMessage.content,
+          createdAt: DateTime.fromJSDate(new Date(Date.now())).toSQL(),
+          id: "newmessageid",
+        });
+
+        return newData;
+      });
+      return { previousMessages };
+    },
+    onError: (err, newMessage, context) => {
+      queryClient.setQueryData(["messages", chatId], context?.previousMessages);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
     },
   });
@@ -154,7 +186,7 @@ function ChatPage() {
             ) : null}
             {chatInfoQuery.isLoading ? <p>Loading chat...</p> : null}
           </div>
-          <div className="flex h-[45vh] max-h-[514px] flex-col-reverse gap-2 overflow-scroll p-2 lg:h-[60vh]">
+          <div className="flex h-[45vh] max-h-[514px] flex-col-reverse gap-2 overflow-y-scroll p-2 lg:h-[60vh]">
             {/* messages container goes here */}
             {messagesQuery.data
               ? messagesQuery.data.messages.map(
@@ -194,9 +226,11 @@ function ChatPage() {
                                 "text-right text-emerald-800",
                             )}
                           >
-                            {DateTime.fromSQL(
-                              message.createdAt!,
-                            ).toLocaleString(DateTime.DATETIME_MED)}
+                            {DateTime.fromSQL(message.createdAt!, {
+                              zone: "UTC",
+                            })
+                              .toLocal()
+                              .toLocaleString(DateTime.DATETIME_MED)}
                           </p>
                           {message.authorIsUser ||
                           chatInfoQuery.data.userIsAdmin ? (
