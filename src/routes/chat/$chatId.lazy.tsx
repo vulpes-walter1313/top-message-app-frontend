@@ -3,14 +3,10 @@ import he from "he";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import {
-  createChatMessage,
   deleteChat,
   deleteChatMembership,
-  deleteMessage,
   getChatInfo,
-  getChatMessages,
   getJoinedChatsInfo,
-  getUserStatus,
 } from "../../lib/queryFunctions";
 import { DateTime } from "luxon";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -18,8 +14,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import ErrorMessage from "../../components/ErrorMessage";
 import { cn } from "../../lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PaginateButtons from "../../components/PaginateButtons";
+import { socket, connectToRoom, leaveRoom } from "../../lib/socketUtils";
 
 export const Route = createLazyFileRoute("/chat/$chatId")({
   component: ChatPage,
@@ -54,15 +51,26 @@ type ChatsType = {
   numOfMembers: number;
 };
 
+const chatMessageSchema = z.object({
+  id: z.string(),
+  authorId: z.string(),
+  author: z.string().nullable(),
+  content: z.string().nullable(),
+  createdAt: z.string().nullable(),
+});
+type ChatMessageType = z.infer<typeof chatMessageSchema> & {
+  authorIsUser: boolean;
+};
+
 function ChatPage() {
   const navigate = useNavigate();
   const { chatId } = Route.useParams();
   const [page, setPage] = useState(1);
+  const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
+  const [currentUserId, setCurrentUserId] = useState("");
+
   const queryClient = useQueryClient();
-  const userQuery = useQuery({
-    queryKey: ["user"],
-    queryFn: getUserStatus,
-  });
+
   const chatInfoQuery = useQuery({
     queryKey: ["chat", chatId],
     queryFn: async () => {
@@ -79,54 +87,70 @@ function ChatPage() {
     },
   });
 
-  const messagesQuery = useQuery({
-    queryKey: ["messages", chatId],
-    queryFn: async () => {
-      const res = await getChatMessages(chatId);
-      return res;
-    },
-    refetchInterval: 5000,
-  });
-
-  const sendMessageMutation = useMutation({
-    mutationFn: createChatMessage,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
-    },
-    onMutate: async (newMessage) => {
-      await queryClient.cancelQueries({ queryKey: ["messages", chatId] });
-
-      const previousMessages = queryClient.getQueryData(["messages", chatId]);
-
-      queryClient.setQueryData(["messages", chatId], (old) => {
-        const newData = structuredClone(old);
-        // @ts-expect-error type issue
-        newData.messages.unshift({
-          author: userQuery.data.userName ?? "You",
-          authorIsUser: true,
-          content: newMessage.content,
-          createdAt: DateTime.fromJSDate(new Date(Date.now())).toSQL(),
-          id: "newmessageid",
-        });
-
-        return newData;
+  useEffect(() => {
+    connectToRoom(chatId)
+      .then((userId) => setCurrentUserId(userId))
+      .catch((err) => {
+        if (err instanceof Error) {
+          console.error(err.message);
+        } else {
+          console.log("Error when trying to connect");
+        }
       });
-      return { previousMessages };
-    },
-    onError: (_err, _newMessage, context) => {
-      queryClient.setQueryData(["messages", chatId], context?.previousMessages);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
-    },
-  });
+    return () => {
+      leaveRoom(chatId);
+    };
+  }, [chatId, setCurrentUserId]);
 
-  const deleteMessageMutation = useMutation({
-    mutationFn: deleteMessage,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
-    },
-  });
+  useEffect(() => {
+    socket.on("connect_error", (err) => {
+      if (err instanceof Error) {
+        console.log(err.message);
+      } else {
+        console.log("Error in connecting");
+      }
+    });
+    socket.on("receive-message", (message) => {
+      console.log("receive-message hit", message);
+      const valResult = chatMessageSchema.safeParse(message);
+      if (valResult.success) {
+        const authorIsUser = currentUserId === valResult.data.authorId;
+        setChatMessages((old) => [
+          { ...valResult.data, authorIsUser: authorIsUser },
+          ...old,
+        ]);
+      } else {
+        console.error(valResult.error);
+      }
+    });
+    socket.on("receive-initial-messages", (messages) => {
+      console.log("receive-initial messages socket event hit");
+      const valResult = chatMessageSchema.safeParse(messages[0]);
+      if (valResult.success) {
+        setChatMessages(() => {
+          const finalMessages: ChatMessageType[] = messages.map((msg) => ({
+            id: msg.id,
+            authorId: msg.authorId,
+            author: msg.author,
+            content: msg.content,
+            createdAt: msg.createdAt,
+            authorIsUser: currentUserId === msg.authorId,
+          }));
+          return finalMessages;
+        });
+        console.log("chat messages:", messages);
+      } else {
+        console.error("Validation of initial messages failed.");
+      }
+    });
+    console.log("connecting to socket");
+    return () => {
+      console.log("disconneting from socket");
+      socket.off("connect_error");
+      socket.off("receive-initial-messages");
+      socket.off("receive-message");
+    };
+  }, [currentUserId]);
 
   const deleteMembershipMutation = useMutation({
     mutationFn: deleteChatMembership,
@@ -157,7 +181,27 @@ function ChatPage() {
     resolver: zodResolver(MessageFormSchema),
   });
   const onSubmit: SubmitHandler<MessageInput> = async (data) => {
-    sendMessageMutation.mutate({ chatId, content: data.content });
+    // sendMessageMutation.mutate({ chatId, content: data.content });
+    socket.emit(
+      "send-message",
+      data.content,
+      chatId,
+      (newMessage: ChatMessageType) => {
+        const valResult = chatMessageSchema.safeParse(newMessage);
+        if (valResult.success) {
+          setChatMessages((old) => [
+            { ...valResult.data, authorIsUser: true },
+            ...old,
+          ]);
+        } else {
+          console.error(
+            "Error in callback from 'send-message' emitter:",
+            valResult.error,
+            newMessage,
+          );
+        }
+      },
+    );
     reset();
   };
   return (
@@ -187,70 +231,82 @@ function ChatPage() {
           </div>
           <div className="flex h-[45vh] max-h-[514px] flex-col-reverse gap-2 overflow-y-scroll p-2 lg:h-[60vh]">
             {/* messages container goes here */}
-            {messagesQuery.data
-              ? messagesQuery.data.messages.map(
-                  (message: {
-                    id: string;
-                    authorId: string;
-                    author: string | null;
-                    authorIsUser: boolean;
-                    content: string | null;
-                    createdAt: string | null;
-                  }) => {
-                    return (
-                      <div
-                        key={message.id}
-                        className={cn(
-                          "max-w-[392px] px-6 py-4",
-                          message.authorIsUser &&
-                            "self-end rounded-bl-3xl rounded-br-sm rounded-tl-3xl rounded-tr-3xl bg-emerald-300 text-emerald-950",
-                          !message.authorIsUser &&
-                            "rounded-bl-sm rounded-br-3xl rounded-tl-3xl rounded-tr-3xl bg-zinc-100 text-zinc-800",
-                        )}
-                      >
-                        <p className="pb-2">{he.decode(message.content!)}</p>
-                        <div>
-                          <p
-                            className={cn(
-                              "text-[0.9375rem] font-medium leading-[145%] lg:font-medium",
-                              message.authorIsUser && "text-right",
-                            )}
+            {chatMessages.length > 0
+              ? chatMessages.map((message) => {
+                  return (
+                    <div
+                      key={message.id}
+                      className={cn(
+                        "max-w-[392px] px-6 py-4",
+                        message.authorIsUser &&
+                          "self-end rounded-bl-3xl rounded-br-sm rounded-tl-3xl rounded-tr-3xl bg-emerald-300 text-emerald-950",
+                        !message.authorIsUser &&
+                          "rounded-bl-sm rounded-br-3xl rounded-tl-3xl rounded-tr-3xl bg-zinc-100 text-zinc-800",
+                      )}
+                    >
+                      <p className="pb-2">{he.decode(message.content!)}</p>
+                      <div>
+                        <p
+                          className={cn(
+                            "text-[0.9375rem] font-medium leading-[145%] lg:font-medium",
+                            message.authorIsUser && "text-right",
+                          )}
+                        >
+                          {message.author}
+                        </p>
+                        <p
+                          className={cn(
+                            "text-[0.8125rem] font-normal leading-[145%] text-zinc-700 lg:text-deskxsp",
+                            message.authorIsUser &&
+                              "text-right text-emerald-800",
+                          )}
+                        >
+                          {DateTime.fromSQL(message.createdAt!, {
+                            zone: "UTC",
+                          })
+                            .toLocal()
+                            .toLocaleString(DateTime.DATETIME_MED)}
+                        </p>
+                        {message.authorIsUser ||
+                        chatInfoQuery.data.userIsAdmin ? (
+                          <button
+                            className="text-right text-deskxsp font-medium text-red-600"
+                            type="button"
+                            onClick={() => {
+                              // deleteMessageMutation.mutate({
+                              //   chatId: chatId,
+                              //   messageId: message.id,
+                              // });
+                              socket.emit(
+                                "delete-message",
+                                message.id,
+                                (
+                                  res:
+                                    | { success: false; error: string }
+                                    | { success: true; messageDeleted: string },
+                                ) => {
+                                  if (res.success) {
+                                    setChatMessages((old) =>
+                                      old.filter(
+                                        (msg) => msg.id != res.messageDeleted,
+                                      ),
+                                    );
+                                    console.log(
+                                      "deleting message: ",
+                                      res.messageDeleted,
+                                    );
+                                  }
+                                },
+                              );
+                            }}
                           >
-                            {message.author}
-                          </p>
-                          <p
-                            className={cn(
-                              "text-[0.8125rem] font-normal leading-[145%] text-zinc-700 lg:text-deskxsp",
-                              message.authorIsUser &&
-                                "text-right text-emerald-800",
-                            )}
-                          >
-                            {DateTime.fromSQL(message.createdAt!, {
-                              zone: "UTC",
-                            })
-                              .toLocal()
-                              .toLocaleString(DateTime.DATETIME_MED)}
-                          </p>
-                          {message.authorIsUser ||
-                          chatInfoQuery.data.userIsAdmin ? (
-                            <button
-                              className="text-right text-deskxsp font-medium text-red-600"
-                              type="button"
-                              onClick={() =>
-                                deleteMessageMutation.mutate({
-                                  chatId: chatId,
-                                  messageId: message.id,
-                                })
-                              }
-                            >
-                              delete
-                            </button>
-                          ) : null}
-                        </div>
+                            delete
+                          </button>
+                        ) : null}
                       </div>
-                    );
-                  },
-                )
+                    </div>
+                  );
+                })
               : null}
           </div>
           <div className="pt-4">
